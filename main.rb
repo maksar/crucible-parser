@@ -3,7 +3,10 @@ require 'mechanize'
 require 'hpricot'
 require 'logger'
 require 'date'
+require 'highline/import'
 
+username = ENV["USERNAME"]
+password = ask("Enter Password for (#{username}): ") { |q| q.echo = "*" }
 
 mechanize = Mechanize.new { |a| a.log = Logger.new("mech.log")}
 doc = Nokogiri::XML(mechanize.get("https://expedia-1.itransition.corp/code/cru/rssReviewFilter?moderator=a.shestakov&state=Review&orRoles=false&complete=true&filter=custom&FEAUTH=a.shestakov:658:96d60ce723ca1702d187d99ab1b2eb17").body)
@@ -23,11 +26,14 @@ result = "||Author||Items||Time||\n" + doc.xpath("//item").map {|item|
 }.join
 
 mechanize.get('https://expedia-1.itransition.corp/wiki/').form_with(:name => "loginform") do |login_form|
-  login_form.os_username = ARGV[0]
-  login_form.os_password = ARGV[1]
+  login_form.os_username = username
+  login_form.os_password = password
 end.submit
 
-mechanize.get("https://expedia-1.itransition.corp/wiki/pages/editpage.action?pageId=8225692").form_with(:name => "editpageform") do |edit_form|
+res = mechanize.get("https://expedia-1.itransition.corp/wiki/pages/editpage.action?pageId=8225692").form_with(:name => "editpageform") do |edit_form|
   edit_form.content = result
 end.submit
+
+say(res.body.to_s["Author"] ? "OK" : "Failure")
+
 
