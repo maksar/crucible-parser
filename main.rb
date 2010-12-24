@@ -22,8 +22,6 @@ result = "||Author||Items||Time||\n" + doc.xpath("//item").map {|item|
   "|#{author}|" + items.inject("") {|s, item| s + "[#{item[:title]}|#{item[:link]}]\n"}[0..-2] + "|" + items.inject("") {|s, item| s + "#{(Date.today - Date.parse(item[:date])).to_i.to_s} days\n"}[0..-2] + "|\n"
 }.join
 
-puts result
-
 mechanize.get('https://expedia-1.itransition.corp/wiki/').form_with(:name => "loginform") do |login_form|
   login_form.os_username = ARGV[0]
   login_form.os_password = ARGV[1]
