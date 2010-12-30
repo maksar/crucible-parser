@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'rubygems'
 require 'mechanize'
 require 'hpricot'
@@ -8,7 +10,7 @@ require 'highline/import'
 username = ENV["USERNAME"]
 password = ask("Enter Password for (#{username}): ") { |q| q.echo = "*" }
 
-mechanize = Mechanize.new { |a| a.log = Logger.new("mech.log")}
+mechanize = Mechanize.new
 doc = Nokogiri::XML(mechanize.get("https://expedia-1.itransition.corp/code/cru/rssReviewFilter?moderator=a.shestakov&state=Review&orRoles=false&complete=true&filter=custom&FEAUTH=a.shestakov:658:96d60ce723ca1702d187d99ab1b2eb17").body)
 
 result = "||Author||Items||Time||\n" + doc.xpath("//item").map {|item|
